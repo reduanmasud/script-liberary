@@ -15,7 +15,9 @@ check_executable() {
 
     # Total counts
     local total_file_count=$(echo "$files" | wc -l)
-    local total_exec_count=$( (echo "$exec_files"; echo "$exec_dirs") | wc -l)
+    local total_dir_count=$(echo "$dirs" | wc -l)
+    local exec_file_count=$(echo "$exec_files" | wc -l)
+    local exec_dir_count=$(echo "$exec_dirs" | wc -l)
 
     # If executable files or directories found, list them
     if [[ -n "$exec_files" || -n "$exec_dirs" ]]; then
@@ -28,8 +30,10 @@ check_executable() {
 
     # Display the counts
     echo ""
-    echo "Total files and directories scanned: $total_file_count"
-    echo "Total executable files and directories: $total_exec_count"
+    echo "Total files scanned: $total_file_count"
+    echo "Total directories scanned: $total_dir_count"
+    echo "Total executable files: $exec_file_count"
+    echo "Total executable directories: $exec_dir_count"
 }
 
 # Main script starts here
