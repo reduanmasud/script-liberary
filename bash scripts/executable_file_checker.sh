@@ -6,17 +6,30 @@ check_executable() {
     local exclude="$2"
 
     # Find all files and directories, excluding the ones mentioned
-    local files=$(find "$path" -not -path "$exclude" -type f -perm /u+x,g+x,o+x)
-    local dirs=$(find "$path" -not -path "$exclude" -type d -perm /u+x,g+x,o+x)
+    local files=$(find "$path" -not -path "$exclude" -type f)
+    local dirs=$(find "$path" -not -path "$exclude" -type d)
 
-    # If files or directories with executable permissions are found, list them
-    if [[ -n "$files" || -n "$dirs" ]]; then
-        echo "Executable files found:"
-        echo "$files"
-        echo "$dirs"
+    # Find files and directories with executable permissions
+    local exec_files=$(find "$path" -not -path "$exclude" -type f -perm /u+x,g+x,o+x)
+    local exec_dirs=$(find "$path" -not -path "$exclude" -type d -perm /u+x,g+x,o+x)
+
+    # Total counts
+    local total_file_count=$(echo "$files" | wc -l)
+    local total_exec_count=$( (echo "$exec_files"; echo "$exec_dirs") | wc -l)
+
+    # If executable files or directories found, list them
+    if [[ -n "$exec_files" || -n "$exec_dirs" ]]; then
+        echo "Executable files and directories found:"
+        echo "$exec_files"
+        echo "$exec_dirs"
     else
         echo "No executable Files found!"
     fi
+
+    # Display the counts
+    echo ""
+    echo "Total files and directories scanned: $total_file_count"
+    echo "Total executable files and directories: $total_exec_count"
 }
 
 # Main script starts here
