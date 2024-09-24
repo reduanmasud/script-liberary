@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define color codes
-RED='\033[0;31m'   # Red for executable files or non-executable directories
+RED='\033[0;31m'   # Red for executable files
 GREEN='\033[0;32m' # Green for non-executable files
 BLUE='\033[0;34m'  # Blue for executable directories
 NC='\033[0m'       # No Color (reset)
@@ -19,8 +19,16 @@ check_permissions() {
     local count_only="$4"
 
     # Find all files and directories, excluding the ones mentioned
-    local files=$(find "$path" -not -path "$exclude" -type f)
-    local dirs=$(find "$path" -not -path "$exclude" -type d)
+    local files
+    local dirs
+
+    if [[ -n "$exclude" ]]; then
+        files=$(find "$path" -not -path "$exclude" -type f)
+        dirs=$(find "$path" -not -path "$exclude" -type d)
+    else
+        files=$(find "$path" -type f)
+        dirs=$(find "$path" -type d)
+    fi
 
     local exec_files=0
     local exec_dirs=0
@@ -33,15 +41,11 @@ check_permissions() {
         perm=$(get_permissions "$dir")
         if [[ -x "$dir" ]]; then
             exec_dirs=$((exec_dirs + 1))
-            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
-                echo -e "[$perm] ${BLUE}${dir}${NC}"
-            elif [[ "$count_only" == false && "$show_exec_only" == true ]]; then
+            if [[ "$count_only" == false ]]; then
                 echo -e "[$perm] ${BLUE}${dir}${NC}"
             fi
-        else
-            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
-                echo -e "[$perm] ${RED}${dir}${NC}"
-            fi
+        elif [[ "$count_only" == false ]]; then
+            echo -e "[$perm] ${RED}${dir}${NC}"
         fi
     done
 
@@ -51,26 +55,20 @@ check_permissions() {
         perm=$(get_permissions "$file")
         if [[ -x "$file" ]]; then
             exec_files=$((exec_files + 1))
-            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
-                echo -e "[$perm] ${RED}${file}${NC}"
-            elif [[ "$count_only" == false && "$show_exec_only" == true ]]; then
+            if [[ "$count_only" == false ]]; then
                 echo -e "[$perm] ${RED}${file}${NC}"
             fi
-        else
-            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
-                echo -e "[$perm] ${GREEN}${file}${NC}"
-            fi
+        elif [[ "$count_only" == false ]]; then
+            echo -e "[$perm] ${GREEN}${file}${NC}"
         fi
     done
 
     # Display the counts
-    # if [[ "$count_only" == true ]]; then
-        echo ""
-        echo "Total files scanned: $total_files"
-        echo "Total directories scanned: $total_dirs"
-        echo "Total executable files: $exec_files"
-        echo "Total executable directories: $exec_dirs"
-    # fi
+    echo ""
+    echo "Total files scanned: $total_files"
+    echo "Total directories scanned: $total_dirs"
+    echo "Total executable files: $exec_files"
+    echo "Total executable directories: $exec_dirs"
 }
 
 # Main script starts here
@@ -97,3 +95,5 @@ done
 
 # Run the check
 check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
+
+# If show_exec_only is true, filter output in the check_permissions function.
