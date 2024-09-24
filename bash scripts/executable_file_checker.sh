@@ -11,6 +11,26 @@ get_permissions() {
     stat -c "%a" "$1"
 }
 
+# Function for "Scanning..." animation
+show_scanning_animation() {
+    while true; do
+        for s in $(seq 1 3); do
+            echo -ne "Scanning"
+            for dot in $(seq 1 $s); do
+                echo -ne "."
+            done
+            echo -ne "\r"  # Carriage return to overwrite the same line
+            sleep 0.5
+        done
+    done
+}
+
+# Function to stop the animation and clear the line
+stop_scanning_animation() {
+    kill "$1"  # Kill the background animation process
+    echo -ne "\r\033[K"  # Clear the line after killing the animation
+}
+
 # Function to check permissions and list files/directories
 check_permissions() {
     local path="$1"
@@ -18,7 +38,6 @@ check_permissions() {
     local show_exec_only="$3"
     local count_only="$4"
 
-    # Find all files and directories, excluding the ones mentioned
     local files
     local dirs
 
@@ -34,6 +53,12 @@ check_permissions() {
     local exec_dirs=0
     local total_files=0
     local total_dirs=0
+
+    # Start the "Scanning..." animation in the background
+    if [[ "$count_only" == true ]]; then
+        show_scanning_animation &
+        anim_pid=$!
+    fi
 
     # Loop through all directories
     while IFS= read -r dir; do
@@ -58,6 +83,11 @@ check_permissions() {
             fi
         fi
     done <<< "$files"
+
+    # Stop the "Scanning..." animation and clear the line
+    if [[ "$count_only" == true ]]; then
+        stop_scanning_animation "$anim_pid"
+    fi
 
     # Display the counts
     echo ""
