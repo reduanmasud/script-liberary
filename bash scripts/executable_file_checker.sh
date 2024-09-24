@@ -44,8 +44,6 @@ check_permissions() {
             if [[ "$count_only" == false ]]; then
                 echo -e "[$perm] ${BLUE}${dir}${NC}"
             fi
-        elif [[ "$count_only" == false ]]; then
-            echo -e "[$perm] ${RED}${dir}${NC}"
         fi
     done
 
@@ -58,8 +56,6 @@ check_permissions() {
             if [[ "$count_only" == false ]]; then
                 echo -e "[$perm] ${RED}${file}${NC}"
             fi
-        elif [[ "$count_only" == false ]]; then
-            echo -e "[$perm] ${GREEN}${file}${NC}"
         fi
     done
 
@@ -93,7 +89,9 @@ for arg in "$@"; do
     fi
 done
 
-# Run the check
-check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
-
-# If show_exec_only is true, filter output in the check_permissions function.
+# If the -e flag is set, adjust the output logic accordingly
+if [[ "$show_exec_only" == true ]]; then
+    check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
+else
+    check_permissions "$scan_dir" "$exclude_path" false "$count_only"
+fi
