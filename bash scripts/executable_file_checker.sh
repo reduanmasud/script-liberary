@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Define color codes
+GREEN='\033[0;32m' # Green for files
+BLUE='\033[0;34m'  # Blue for directories
+NC='\033[0m'       # No Color (reset)
+
 # Function to check executable permissions and list files/directories
 check_executable() {
     local path="$1"
@@ -21,9 +26,15 @@ check_executable() {
 
     # If executable files or directories found, list them
     if [[ -n "$exec_files" || -n "$exec_dirs" ]]; then
-        echo "Executable files and directories found:"
-        echo "$exec_files"
-        echo "$exec_dirs"
+        echo -e "Executable files and directories found:"
+        # Print executable files in green
+        for file in $exec_files; do
+            echo -e "${GREEN}${file}${NC}"
+        done
+        # Print executable directories in blue
+        for dir in $exec_dirs; do
+            echo -e "${BLUE}${dir}${NC}"
+        done
     else
         echo "No executable Files found!"
     fi
