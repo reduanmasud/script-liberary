@@ -14,7 +14,7 @@ get_permissions() {
 # Function for "Scanning..." animation
 show_scanning_animation() {
     while true; do
-        for s in $(seq 1 3); do
+        for s in $(seq 1 10); do
             echo -ne "Scanning"
             for dot in $(seq 1 $s); do
                 echo -ne "."
