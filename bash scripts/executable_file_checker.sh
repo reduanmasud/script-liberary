@@ -11,17 +11,17 @@ get_permissions() {
     stat -c "%a" "$1"
 }
 
-# Function for "Scanning..." animation
+# Function for "Scanning..." animation with bouncing dots
 show_scanning_animation() {
     while true; do
-        for s in $(seq 1 10); do
-            echo -ne "Scanning"
-            for dot in $(seq 1 $s); do
-                echo -ne "."
-            done
-            echo -ne "\r"  # Carriage return to overwrite the same line
-            sleep 0.5
-        done
+        echo -ne "Scanning.\r"
+        sleep 0.5
+        echo -ne "Scanning..\r"
+        sleep 0.5
+        echo -ne "Scanning...\r"
+        sleep 0.5
+        echo -ne "Scanning    \r"  # Clear the dots
+        sleep 0.5
     done
 }
 
@@ -66,8 +66,14 @@ check_permissions() {
         perm=$(get_permissions "$dir")
         if [[ -x "$dir" ]]; then
             exec_dirs=$((exec_dirs + 1))
-            if [[ "$count_only" == false ]]; then
+            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
                 echo -e "[$perm] ${BLUE}${dir}${NC}"
+            elif [[ "$count_only" == false && "$show_exec_only" == true ]]; then
+                echo -e "[$perm] ${BLUE}${dir}${NC}"
+            fi
+        else
+            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
+                echo -e "[$perm] ${RED}${dir}${NC}"
             fi
         fi
     done <<< "$dirs"
@@ -78,8 +84,14 @@ check_permissions() {
         perm=$(get_permissions "$file")
         if [[ -x "$file" ]]; then
             exec_files=$((exec_files + 1))
-            if [[ "$count_only" == false ]]; then
+            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
                 echo -e "[$perm] ${RED}${file}${NC}"
+            elif [[ "$count_only" == false && "$show_exec_only" == true ]]; then
+                echo -e "[$perm] ${RED}${file}${NC}"
+            fi
+        else
+            if [[ "$count_only" == false && "$show_exec_only" == false ]]; then
+                echo -e "[$perm] ${GREEN}${file}${NC}"
             fi
         fi
     done <<< "$files"
@@ -119,9 +131,5 @@ for arg in "$@"; do
     fi
 done
 
-# If the -e flag is set, adjust the output logic accordingly
-if [[ "$show_exec_only" == true ]]; then
-    check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
-else
-    check_permissions "$scan_dir" "$exclude_path" false "$count_only"
-fi
+# Run the check
+check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
