@@ -36,7 +36,7 @@ check_permissions() {
     local total_dirs=0
 
     # Loop through all directories
-    for dir in $dirs; do
+    while IFS= read -r dir; do
         total_dirs=$((total_dirs + 1))
         perm=$(get_permissions "$dir")
         if [[ -x "$dir" ]]; then
@@ -45,10 +45,10 @@ check_permissions() {
                 echo -e "[$perm] ${BLUE}${dir}${NC}"
             fi
         fi
-    done
+    done <<< "$dirs"
 
     # Loop through all files
-    for file in $files; do
+    while IFS= read -r file; do
         total_files=$((total_files + 1))
         perm=$(get_permissions "$file")
         if [[ -x "$file" ]]; then
@@ -57,7 +57,7 @@ check_permissions() {
                 echo -e "[$perm] ${RED}${file}${NC}"
             fi
         fi
-    done
+    done <<< "$files"
 
     # Display the counts
     echo ""
