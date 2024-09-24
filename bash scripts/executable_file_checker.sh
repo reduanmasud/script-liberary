@@ -96,4 +96,4 @@ for arg in "$@"; do
 done
 
 # Run the check
-check_permissions "$show_exec_only" "$count_only" "$scan_dir" "$exclude_path"
+check_permissions "$scan_dir" "$exclude_path" "$show_exec_only" "$count_only"
