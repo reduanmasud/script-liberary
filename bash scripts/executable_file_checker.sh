@@ -64,11 +64,13 @@ check_permissions() {
     done
 
     # Display the counts
-    echo ""
-    echo "Total files scanned: $total_files"
-    echo "Total directories scanned: $total_dirs"
-    echo "Total executable files: $exec_files"
-    echo "Total executable directories: $exec_dirs"
+    # if [[ "$count_only" == true ]]; then
+        echo ""
+        echo "Total files scanned: $total_files"
+        echo "Total directories scanned: $total_dirs"
+        echo "Total executable files: $exec_files"
+        echo "Total executable directories: $exec_dirs"
+    # fi
 }
 
 # Main script starts here
